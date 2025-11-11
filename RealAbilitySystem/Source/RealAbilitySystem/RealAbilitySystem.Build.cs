@@ -26,6 +26,10 @@ public class RealAbilitySystem : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Engine",
+				"GameplayAbilities",
+				"GameplayTags",
+				"GameplayTasks",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -38,9 +42,6 @@ public class RealAbilitySystem : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"GameplayAbilities",
-				"GameplayTags",
-				"GameplayTasks",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
