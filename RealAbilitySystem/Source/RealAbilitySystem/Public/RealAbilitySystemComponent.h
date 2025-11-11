@@ -13,15 +13,17 @@ class REALABILITYSYSTEM_API URealAbilitySystemComponent : public UAbilitySystemC
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	URealAbilitySystemComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	virtual void OnRep_ActivateAbilities() override;
 
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable, Category = "RealAbilitySystem")
+	void SetAbilityLevel(TSubclassOf<UGameplayAbility> AbilityClass, int32 Level);
+
+	UFUNCTION(BlueprintCallable, Category = "RealAbilitySystem")
+	void AddToAbilityLevel(TSubclassOf<UGameplayAbility> AbilityClass, int32 Level = 1);
+	
+private:
+	void HandleAutoActivatedAbility(const FGameplayAbilitySpec& AbilitySpec);
 };

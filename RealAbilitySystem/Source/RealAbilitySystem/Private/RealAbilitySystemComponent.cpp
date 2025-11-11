@@ -2,35 +2,63 @@
 
 
 #include "RealAbilitySystemComponent.h"
+#include "RealAbilitySystemTags.h"
 
 
-// Sets default values for this component's properties
 URealAbilitySystemComponent::URealAbilitySystemComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-
-// Called when the game starts
-void URealAbilitySystemComponent::BeginPlay()
+void URealAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
 {
-	Super::BeginPlay();
+	Super::OnGiveAbility(AbilitySpec);
 
-	// ...
-	
+	HandleAutoActivatedAbility(AbilitySpec);
 }
 
-
-// Called every frame
-void URealAbilitySystemComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                                FActorComponentTickFunction* ThisTickFunction)
+void URealAbilitySystemComponent::OnRep_ActivateAbilities()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::OnRep_ActivateAbilities();
 
-	// ...
+	FScopedAbilityListLock ActiveScopeLock(*this);
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		HandleAutoActivatedAbility(AbilitySpec);
+	}
 }
 
+void URealAbilitySystemComponent::SetAbilityLevel(TSubclassOf<UGameplayAbility> AbilityClass, int32 Level)
+{
+	if (IsValid(GetAvatarActor()) && !GetAvatarActor()->HasAuthority()) return;
+
+	if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromClass(AbilityClass))
+	{
+		AbilitySpec->Level = Level;
+		MarkAbilitySpecDirty(*AbilitySpec);
+	}
+}
+
+void URealAbilitySystemComponent::AddToAbilityLevel(TSubclassOf<UGameplayAbility> AbilityClass, int32 Level)
+{
+	if (IsValid(GetAvatarActor()) && !GetAvatarActor()->HasAuthority()) return;
+
+	if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromClass(AbilityClass))
+	{
+		AbilitySpec->Level += Level;
+		MarkAbilitySpecDirty(*AbilitySpec);
+	}
+}
+
+void URealAbilitySystemComponent::HandleAutoActivatedAbility(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (!IsValid(AbilitySpec.Ability)) return;
+
+	for (const FGameplayTag& Tag : AbilitySpec.Ability->GetAssetTags())
+	{
+		if (Tag.MatchesTagExact(RASTags::Abilities::ActivateOnGiven))
+		{
+			TryActivateAbility(AbilitySpec.Handle);
+			return;
+		}
+	}
+}
