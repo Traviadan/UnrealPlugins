@@ -6,6 +6,8 @@ namespace RASTags
 	
 	namespace Abilities
 	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(ActivateOnGiven, "RASTags.Abilities.ActivateOnGiven", "Tag for Abilities that should activate immediately once given.")
+		
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Primary, "RASTags.Abilities.Primary", "Tag for the primary Ability")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Secondary, "RASTags.Abilities.Secondary", "Tag for the secondary Ability")
 		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tertiary, "RASTags.Abilities.Tertiary", "Tag for the tertiary Ability")
